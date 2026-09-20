@@ -4,7 +4,7 @@
   "private": true,
   "description": "CivicAid AI - An Agentic Eligibility & Benefits Navigator for Indian Citizens",
   "scripts": {
-    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "build": "node scripts/build_frontend.js",
     "frontend:dev": "npm --prefix frontend run dev",
     "frontend:build": "npm --prefix frontend run build",
     "frontend:preview": "npm --prefix frontend run preview",
