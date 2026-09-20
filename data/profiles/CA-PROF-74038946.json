@@ -1,0 +1,37 @@
+{
+  "id": "CA-PROF-74038946",
+  "created_at": "2026-09-20T13:04:02.489076+00:00",
+  "updated_at": "2026-09-20T13:04:02.489076+00:00",
+  "version": "1.0.0",
+  "location": {
+    "state": "Uttar Pradesh",
+    "district": "Varanasi",
+    "area_type": "Rural"
+  },
+  "demographics": {
+    "age": 28,
+    "gender": "Male",
+    "social_category": "OBC (Other Backward Classes)",
+    "disability": {
+      "status": false,
+      "percentage": null
+    }
+  },
+  "socio_economic": {
+    "annual_family_income": 180000,
+    "occupation": "Farmer",
+    "education_level": "Higher Secondary / 12th Pass",
+    "employment_status": "Agricultural Labor"
+  },
+  "special_circumstances": [
+    "BPL Ration Card Holder"
+  ],
+  "goals": [
+    "agriculture",
+    "financial assistance"
+  ],
+  "income_slab": "BPL / Lower Income Group (\u20b91L - \u20b92.5 Lakhs)",
+  "is_minor": false,
+  "is_senior_citizen": false,
+  "profile_completion_percentage": 100
+}

@@ -1,0 +1,23 @@
+{
+  "name": "civicaid-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CivicAid AI - An Agentic Eligibility & Benefits Navigator for Indian Citizens",
+  "scripts": {
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:preview": "npm --prefix frontend run preview",
+    "backend:dev": "python -m uvicorn backend.app.main:app --reload --port 8000",
+    "backend:test": "python -m pytest backend/tests"
+  },
+  "keywords": [
+    "civicaid",
+    "ai",
+    "welfare",
+    "govtech",
+    "schemes",
+    "india"
+  ],
+  "author": "CivicAid AI Team",
+  "license": "MIT"
+}

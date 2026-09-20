@@ -1,0 +1,38 @@
+{
+  "id": "CA-PROF-4E65F39A",
+  "created_at": "2026-09-20T13:06:06.597596+00:00",
+  "updated_at": "2026-09-20T13:06:06.597596+00:00",
+  "version": "1.0.0",
+  "location": {
+    "state": "Maharashtra",
+    "district": "Pune",
+    "area_type": "Urban"
+  },
+  "demographics": {
+    "age": 29,
+    "gender": "Female",
+    "social_category": "General",
+    "disability": {
+      "status": false,
+      "percentage": null
+    }
+  },
+  "socio_economic": {
+    "annual_family_income": 350000,
+    "occupation": "Entrepreneur",
+    "education_level": "Graduate / Bachelor's Degree",
+    "employment_status": "Self-Employed / Business"
+  },
+  "special_circumstances": [
+    "Woman Head of Household"
+  ],
+  "goals": [
+    "entrepreneurship",
+    "healthcare",
+    "financial assistance"
+  ],
+  "income_slab": "EWS / Low Income Group (\u20b92.5L - \u20b95 Lakhs)",
+  "is_minor": false,
+  "is_senior_citizen": false,
+  "profile_completion_percentage": 100
+}
