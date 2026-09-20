@@ -27,7 +27,7 @@ import {
   Home,
   Check
 } from 'lucide-react';
-import { checkBackendHealth, fetchSchemes, evaluateCitizenEligibility } from './services/api';
+import { checkBackendHealth, fetchSchemes, evaluateCitizenEligibility, getApiBaseUrl } from './services/api';
 import {
   getSavedDraftProfile,
   calculateCompletionPercentage,
@@ -40,6 +40,7 @@ import AISchemeSearch from './components/AISchemeSearch';
 import AIBenefitsAdvisor from './components/AIBenefitsAdvisor';
 import DocumentReadinessChecker from './components/DocumentReadinessChecker';
 import ApplicationCopilot from './components/ApplicationCopilot';
+import BackendConnectorModal from './components/BackendConnectorModal';
 
 const DEFAULT_CATEGORIES = [
   'All',
@@ -60,6 +61,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isConnectorOpen, setIsConnectorOpen] = useState(false);
   
   // Citizen profile state loaded from local draft
   const [profile, setProfile] = useState(() => getSavedDraftProfile());
@@ -73,23 +75,24 @@ export default function App() {
   // Navigation tabs: 'home' | 'advisor' | 'search' | 'wizard' | 'passport' | 'documents' | 'copilot' | 'explore' | 'evaluate'
   const [activeTab, setActiveTab] = useState('home');
 
+  const refreshConnection = async (targetUrl = null) => {
+    setLoading(true);
+    const healthData = await checkBackendHealth(targetUrl);
+    setHealth(healthData);
+
+    try {
+      const schemesData = await fetchSchemes('', '', true);
+      setSchemes(schemesData);
+    } catch (err) {
+      console.error('Failed to load schemes:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Check health and load schemes on mount
   useEffect(() => {
-    async function init() {
-      setLoading(true);
-      const healthData = await checkBackendHealth();
-      setHealth(healthData);
-
-      try {
-        const schemesData = await fetchSchemes();
-        setSchemes(schemesData);
-      } catch (err) {
-        console.error('Failed to load initial schemes:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    init();
+    refreshConnection();
   }, []);
 
   // Filter schemes in Explore tab
@@ -358,9 +361,54 @@ export default function App() {
               <span className="hidden sm:inline">Schemes</span>
               <span className="text-[10px] text-slate-500 font-mono">({schemes.length})</span>
             </button>
+
+            {/* Server Connection Status Trigger */}
+            <button
+              onClick={() => setIsConnectorOpen(true)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition cursor-pointer shrink-0 ml-1 ${
+                health.status === 'online'
+                  ? 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30 hover:bg-emerald-900/40'
+                  : 'bg-amber-950/40 text-amber-400 border-amber-500/40 hover:bg-amber-900/40 animate-pulse'
+              }`}
+              title="Click to configure or test FastAPI backend connection"
+            >
+              <span className={`w-2 h-2 rounded-full ${health.status === 'online' ? 'bg-emerald-400 shadow-sm shadow-emerald-400' : 'bg-amber-400'}`}></span>
+              <span className="hidden xl:inline">
+                {health.status === 'online' ? `API Online (${health.latencyMs || 0}ms)` : 'Backend Status'}
+              </span>
+              <span className="xl:hidden">
+                {health.status === 'online' ? 'API' : 'Connect'}
+              </span>
+            </button>
           </nav>
         </div>
       </header>
+
+      {/* Backend Offline / Sleeping Warning Banner */}
+      {health.status === 'offline' && (
+        <div className="bg-amber-950/80 border-b border-amber-800/60 px-4 py-2.5 text-amber-200 text-xs flex items-center justify-between gap-3 sticky top-16 z-40 backdrop-blur-md">
+          <div className="flex items-center gap-2 max-w-4xl truncate">
+            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+            <span className="truncate">
+              <strong>Backend Disconnected:</strong> Targeting <code className="bg-slate-900 px-1 py-0.5 rounded font-mono text-[11px] text-amber-300">{getApiBaseUrl()}</code>. If deployed on Render, free instances may take ~30s to wake up.
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => refreshConnection()}
+              className="px-2.5 py-1 rounded-lg bg-amber-900/80 hover:bg-amber-800 text-amber-100 font-bold text-xs transition cursor-pointer"
+            >
+              Re-test
+            </button>
+            <button
+              onClick={() => setIsConnectorOpen(true)}
+              className="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow transition cursor-pointer"
+            >
+              Set Backend URL
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Interactive Views */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
@@ -482,6 +530,7 @@ export default function App() {
               setActiveTab('copilot');
             }}
             onEditProfile={() => setActiveTab('wizard')}
+            onOpenConnector={() => setIsConnectorOpen(true)}
           />
         )}
 
@@ -493,6 +542,7 @@ export default function App() {
               setSelectedSchemeDetail(scheme);
               setActiveTab('copilot');
             }}
+            onOpenConnector={() => setIsConnectorOpen(true)}
           />
         )}
 
@@ -640,6 +690,13 @@ export default function App() {
           "Based on available scheme information. This tool provides informational guidance and does not guarantee eligibility or approval. All official welfare applications must be submitted directly through designated government portals (.gov.in / .nic.in)."
         </p>
       </footer>
+
+      {/* Backend URL & Health Configuration Modal */}
+      <BackendConnectorModal
+        isOpen={isConnectorOpen}
+        onClose={() => setIsConnectorOpen(false)}
+        onConnected={(newUrl) => refreshConnection(newUrl)}
+      />
     </div>
   );
 }

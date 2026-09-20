@@ -29,7 +29,7 @@ const SAMPLE_QUERIES = [
   "Unorganized worker wanting a guaranteed monthly pension for retirement."
 ];
 
-export default function AISchemeSearch({ citizenProfile, onSelectScheme }) {
+export default function AISchemeSearch({ citizenProfile, onSelectScheme, onOpenConnector }) {
   const [query, setQuery] = useState('');
   const [useProfile, setUseProfile] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,8 @@ export default function AISchemeSearch({ citizenProfile, onSelectScheme }) {
       setSearchStats({
         query: data.query,
         total: data.total_results || 0,
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toLocaleTimeString(),
+        isFallback: !!data.is_fallback
       });
     } catch (err) {
       console.error('Search error:', err);
@@ -157,21 +158,43 @@ export default function AISchemeSearch({ citizenProfile, onSelectScheme }) {
 
       {/* Error Alert */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center gap-3">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-          <span>{error}</span>
+        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{error}</span>
+          </div>
+          {onOpenConnector && (
+            <button
+              onClick={onOpenConnector}
+              className="px-3 py-1.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-xs font-bold border border-rose-700/60 transition shrink-0 cursor-pointer"
+            >
+              Configure Backend URL
+            </button>
+          )}
         </div>
       )}
 
       {/* Results Header / Stats */}
       {searchStats && !loading && (
-        <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-400 px-1">
           <div>
-            Showing <strong>{searchStats.total}</strong> semantic matches for:{" "}
+            Showing <strong>{searchStats.total}</strong> matches for:{" "}
             <span className="text-emerald-400 italic font-medium">"{searchStats.query}"</span>
           </div>
-          <div className="text-[11px] text-slate-500">
-            Retrieved at {searchStats.timestamp} (Zero Hallucination Guaranteed)
+          <div className="flex items-center gap-2">
+            {searchStats.isFallback && (
+              <span className="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                <span>⚡ Local Grounded Cache</span>
+                {onOpenConnector && (
+                  <button onClick={onOpenConnector} className="underline hover:text-amber-200 cursor-pointer">
+                    (Connect Live Backend)
+                  </button>
+                )}
+              </span>
+            )}
+            <span className="text-[11px] text-slate-500">
+              Retrieved at {searchStats.timestamp}
+            </span>
           </div>
         </div>
       )}

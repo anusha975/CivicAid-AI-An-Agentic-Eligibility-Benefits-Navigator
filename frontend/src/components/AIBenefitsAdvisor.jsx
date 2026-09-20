@@ -36,7 +36,7 @@ const AGENT_STAGES = [
   { id: 'guide', name: 'Application Guide', role: 'Step-by-step submission roadmap & DBT', icon: ListOrdered, color: 'text-teal-400' }
 ];
 
-export default function AIBenefitsAdvisor({ citizenProfile, onSelectScheme, onEditProfile }) {
+export default function AIBenefitsAdvisor({ citizenProfile, onSelectScheme, onEditProfile, onOpenConnector }) {
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('ALL'); // 'ALL' | 'ELIGIBLE' | 'POSSIBLY_ELIGIBLE' | 'INSUFFICIENT_INFORMATION' | 'NOT_ELIGIBLE' | 'DOCUMENTS' | 'ROADMAP'
   const [loading, setLoading] = useState(false);
@@ -197,9 +197,19 @@ export default function AIBenefitsAdvisor({ citizenProfile, onSelectScheme, onEd
 
       {/* Error Alert */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center gap-3">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-          <span>{error}</span>
+        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{error}</span>
+          </div>
+          {onOpenConnector && (
+            <button
+              onClick={onOpenConnector}
+              className="px-3 py-1.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-xs font-bold border border-rose-700/60 transition shrink-0 cursor-pointer"
+            >
+              Configure Backend URL
+            </button>
+          )}
         </div>
       )}
 
