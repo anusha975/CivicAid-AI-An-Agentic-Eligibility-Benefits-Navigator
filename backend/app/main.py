@@ -23,13 +23,15 @@ def create_application() -> FastAPI:
         redoc_url="/redoc",
     )
 
-    # CORS configuration
+    # CORS configuration with regex reflection to support all cloud and preview domains
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.CORS_ORIGINS if isinstance(settings.CORS_ORIGINS, list) else ["*"],
+        allow_origins=["*"],
+        allow_origin_regex=r".*",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["*"],
     )
 
     # Request Execution Timing & Correlation ID Middleware
